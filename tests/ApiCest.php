@@ -1,10 +1,10 @@
 <?php
-
+// phpcs:ignoreFile
 use Codeception\Example;
 
 /**
  * Тесты API сервиса
- * 
+ *
  */
 class ApiCest
 {
