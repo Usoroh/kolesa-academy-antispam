@@ -4,6 +4,7 @@ use Codeception\Example;
 
 /**
  * Тесты API сервиса
+ * 
  */
 class ApiCest
 {

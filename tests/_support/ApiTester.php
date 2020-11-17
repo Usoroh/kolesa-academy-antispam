@@ -2,7 +2,7 @@
 
 
 /**
- * Inherited Methods
+ * Inherited Methods ApiTester
  *
  * @method void wantToTest($text)
  * @method void wantTo($text)
