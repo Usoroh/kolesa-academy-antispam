@@ -79,7 +79,7 @@ class SpamDetector
         }
 
         //проверяем на наличие имэйла
-        if (filter_var($message, FILTER_VALIDATE_EMAIL)) {
+        if (preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $message)) {
             return ['is_spam' => true, 'reason' => 'block_list'];
         }
 
