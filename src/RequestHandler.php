@@ -35,6 +35,7 @@ class RequestHandler {
      * @return string Ответ в формате JSON.
      */
     private function handleGetRequest(): string {
+        header('Content-type: application/json; charset=utf-8');
         http_response_code(200);
         return json_encode(['status' => 'ok', 'message' => 'Антиспам работает']);
     }
@@ -46,6 +47,7 @@ class RequestHandler {
      */
     private function handlePostRequest(): string {
         if (!isset($_POST['text'])) {
+            header('Content-type: application/json; charset=utf-8');
             http_response_code(400);
             return json_encode(['status' => 'error', 'message' => 'field text required']);
         }
@@ -62,7 +64,7 @@ class RequestHandler {
             'reason' => $result['reason'] ?? "",
             'normalized_text' => $this->messageNormalizer->normalize($message)
         ];
-
+        header('Content-type: application/json; charset=utf-8');
         http_response_code(200);
         return json_encode($response);
     }
@@ -73,6 +75,7 @@ class RequestHandler {
      * @return string Ответ в формате JSON.
      */
     private function handleInvalidMethod(): string {
+        header('Content-type: application/json; charset=utf-8');
         http_response_code(405);
         return json_encode(['status' => 'error', 'message' => 'Метод не разрешен']);
     }
