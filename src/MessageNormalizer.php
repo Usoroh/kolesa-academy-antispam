@@ -5,12 +5,10 @@ namespace src;
 class MessageNormalizer
 {
     private $stopWords;
-    private $blockList;
 
-    public function __construct($stopWordsPath, $blockListPath)
+    public function __construct($stopWordsPath)
     {
         $this->stopWords = file($stopWordsPath, FILE_IGNORE_NEW_LINES);
-        $this->blockList = file($blockListPath, FILE_IGNORE_NEW_LINES);
     }
 
     //Нормализуем сообщение
@@ -25,7 +23,7 @@ class MessageNormalizer
         return implode(' ', $tokens);
     }
 
-    //метод для разбивки сообщения на тоекены
+    //метод для разбивки сообщения на токены
     private function tokenize($message)
     {
         //ищем в тексте имэйлы и отдельные слова
@@ -49,11 +47,5 @@ class MessageNormalizer
         return array_filter($tokens, function ($token) {
             return !is_numeric($token);
         });
-    }
-
-    //проверям в блок листе ли слово
-    public function isWordInBlockList($word)
-    {
-        return in_array($word, $this->blockList);
     }
 }
