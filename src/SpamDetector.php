@@ -26,7 +26,7 @@ class SpamDetector
         if ($checkRate) {
             $lastMessageTime = $this->redis->get($lastMessageTimeKey);
             if ($lastMessageTime && (time() - $lastMessageTime < 3)) {
-                return ['is_spam' => true, 'reason' => 'duplicate'];
+                return ['is_spam' => true, 'reason' => 'check_rate'];
             }
         }
 
