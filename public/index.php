@@ -2,47 +2,68 @@
 
 session_start();
 
+// Подключаем необходимые библиотеки и классы
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/MessageNormalizer.php';
 require_once __DIR__ . '/../src/SpamDetector.php';
 
-//Редис
+// Настройка Редис
 $redisConfig = [
     'scheme' => 'tcp',
     'host'   => 'redis',
     'port'   => 6379,
 ];
 
-// создаем инстанс SpamDetector-а
+// Создаем экземпляр класса SpamDetector
 $spamDetector = new \src\SpamDetector(__DIR__ . '/../docs/stopwords.txt', __DIR__ . '/../docs/blocklist.txt', $redisConfig);
 
-// создаем айди сессии чтобы следить за кол-вом отправленных сообщений
+// Создаем идентификатор сессии для отслеживания сообщений пользователя
 if (!isset($_SESSION['client_session_id'])) {
     $_SESSION['client_session_id'] = session_create_id();
 }
 
-// Проверяем что был сделан POST запрос с нужными данными
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['text'])) {
-    $message = $_POST['text'];
-    $clientID = $_SESSION['client_session_id'];
-    $checkRate = isset($_POST['check_rate']) && $_POST['check_rate'] == '1';
+// Заголовок ответа
+header('Content-type: application/json; charset=utf-8');
 
-    // проверяем сообщение на спам
-    $result = $spamDetector->checkSpam($message, $clientID, $checkRate);
+// Обрабатываем запрос в зависимости от его метода
+switch ($_SERVER['REQUEST_METHOD']) {
+    case "GET":
+        // Если это GET-запрос, просто возвращаем статус сервиса
+        http_response_code(200);
+        echo json_encode(['status' => 'ok', 'message' => 'Антиспам работает']);
+        break;
 
-    // составляем ответ
-    $response = [
-        'status' => 'ok',
-        'spam' => $result['is_spam'],
-        'reason' => $result['reason'] ?? "",
-        'normalized_text' => (new \src\MessageNormalizer(__DIR__ . '/../docs/stopwords.txt'))->normalize($message)
-    ];
+    case "POST":
+        // Если POST-запрос не содержит текст, возвращаем ошибку
+        if (!isset($_POST['text'])) {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Требуется поле текста']);
+            break;
+        }
 
-    header('Content-type: application/json; charset=utf-8');
-    http_response_code(200);
-    echo json_encode($response);
-} else {
-    header('Content-type: application/json; charset=utf-8');
-    http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => 'Неверный запрос']);
+        // Получаем сообщение и информацию о клиенте
+        $message = $_POST['text'];
+        $clientID = $_SESSION['client_session_id'];
+        $checkRate = isset($_POST['check_rate']) && $_POST['check_rate'] == '1';
+
+        // Проверяем сообщение на спам
+        $result = $spamDetector->checkSpam($message, $clientID, $checkRate);
+
+        // Формируем и отправляем ответ
+        $response = [
+            'status' => 'ok',
+            'spam' => $result['is_spam'],
+            'reason' => $result['reason'] ?? "",
+            'normalized_text' => (new \src\MessageNormalizer(__DIR__ . '/../docs/stopwords.txt'))->normalize($message)
+        ];
+
+        http_response_code(200);
+        echo json_encode($response);
+        break;
+
+    default:
+        // Если используется другой HTTP-метод, возвращаем ошибку
+        http_response_code(405);
+        echo json_encode(['status' => 'error', 'message' => 'Метод не разрешен']);
+        break;
 }
