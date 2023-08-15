@@ -16,18 +16,26 @@ class MessageNormalizer
     //Нормализуем сообщение
     public function normalize($message)
     {
+        $message = mb_strtolower($message);
+        echo $message;
         $tokens = $this->tokenize($message);
         $tokens = $this->removeStopWords($tokens);
         $tokens = $this->removeNumericWords($tokens);
         sort($tokens);
+        $tokens = array_filter($tokens);
         return $tokens;
     }
 
     //метод для разбивки сообщения на тоекены
     private function tokenize($message)
     {
-        $pattern = '/[\\.\\,\\!\\?\\[\\]\\(\\)\\<\\>\\:\\;\\-\\n\\\'\\r\\s\\"\\/\\*\\|]+/';
-        return preg_split($pattern, strtolower($message));
+        //ищем в тексте имэйлы и отдельные слова
+        $pattern = '/(\\S+@\\S+\\.\\S+)|[\\.\\,\\!\\?\\[\\]\\(\\)\\<\\>\\:\\;\\-\\n\\\'\\r\\s\\"\\/\\*\\|]+/';
+        $tokens = preg_split($pattern, strtolower($message), -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        return array_values(array_filter($tokens, function ($token) {
+            //убираем токены если они не являются словом или имэйлом
+            return filter_var($token, FILTER_VALIDATE_EMAIL) || !preg_match('/^[\\.\\,\\!\\?\\[\\]\\(\\)\\<\\>\\:\\;\\-\\n\\\'\\r\\s\\"\\/\\*\\|]+$/', $token);
+        }));
     }
 
     //убираем стоп слова
