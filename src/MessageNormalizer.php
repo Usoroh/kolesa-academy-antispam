@@ -11,8 +11,13 @@ class MessageNormalizer
         $this->stopWords = file($stopWordsPath, FILE_IGNORE_NEW_LINES);
     }
 
-    //Нормализуем сообщение
-    public function normalize($message)
+    /**
+     * Нормализация сообщения
+     *
+     * @param string $message
+     * @return string
+     */
+    public function normalize(string $message): string
     {
         $message = mb_strtolower($message);
         $tokens = $this->tokenize($message);
@@ -23,26 +28,42 @@ class MessageNormalizer
         return implode(' ', $tokens);
     }
 
-    //метод для разбивки сообщения на токены
-    private function tokenize($message)
+    /**
+     * Токенизация сообщения
+     *
+     * @param string $message
+     * @return array
+     */
+    private function tokenize(string $message): array
     {
-        //ищем в тексте имэйлы и отдельные слова
-        $pattern = '/(\\S+@\\S+\\.\\S+)|[\\.\\,\\!\\?\\[\\]\\(\\)\\<\\>\\:\\;\\-\\n\\\'\\r\\s\\"\\/\\*\\|]+/';
+        // Ищем в тексте имэйлы и отдельные слова
+        $pattern = '#(\\S+@\\S+\\.\\S+)|[.,!?\[\\]()<>:;\\-\\n\'\\r\\s"/*|]+#';
         $tokens = preg_split($pattern, strtolower($message), -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+
+        // Убираем токены которые не являются отдельными словами или имэйлами
         return array_values(array_filter($tokens, function ($token) {
-            //убираем токены если они не являются словом или имэйлом
-            return filter_var($token, FILTER_VALIDATE_EMAIL) || !preg_match('/^[\\.\\,\\!\\?\\[\\]\\(\\)\\<\\>\\:\\;\\-\\n\\\'\\r\\s\\"\\/\\*\\|]+$/', $token);
+            return filter_var($token, FILTER_VALIDATE_EMAIL) || !preg_match('#^[.,!?\[\\]()<>:;\\-\\n\'\\r\\s"/*|]+$#', $token);
         }));
     }
 
-    //убираем стоп слова
-    private function removeStopWords($tokens)
+    /**
+     * Убирает стоп слова
+     *
+     * @param array $tokens
+     * @return array
+     */
+    private function removeStopWords(array $tokens): array
     {
         return array_diff($tokens, $this->stopWords);
     }
 
-    //убираем слова состоящие из цифр
-    private function removeNumericWords($tokens)
+    /**
+     * Убирает слова состоящие из цифр
+     *
+     * @param array $tokens
+     * @return array
+     */
+    private function removeNumericWords(array $tokens): array
     {
         return array_filter($tokens, function ($token) {
             return !is_numeric($token);
