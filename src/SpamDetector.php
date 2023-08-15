@@ -14,7 +14,7 @@ class SpamDetector
      * Конструктор класса SpamDetector.
      *
      * @param string $stopWordsPath Путь к файлу со стоп-словами.
-     * @param string $blockListPath Путь к файлу со списком заблокированных слов.
+     * @param string $blockListPath Путь к файлу со списком запрещенных слов.
      * @param array $redisConfig Конфигурация для Redis.
      */
     public function __construct(string $stopWordsPath, string $blockListPath, array $redisConfig = [])
@@ -60,7 +60,7 @@ class SpamDetector
     /**
      * Проверка на спам.
      *
-     * @param string $message Сообщение для проверки.
+     * @param string $message Сообщение которое проверяем.
      * @param string $clientID ID клиента.
      * @param bool $checkRate Флаг для проверки частоты отправки сообщений.
      * @return array Возвращает массив с результатами проверки.
