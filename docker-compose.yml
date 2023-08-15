@@ -5,7 +5,7 @@ services:
     image: nginx:1.17-alpine
     volumes:
       - ./docker/nginx/nginx.conf:/config/nginx.conf
-      - ./:/code
+      - ./:/kolesa-academy-antispam
     command: nginx -c /config/nginx.conf
     user: root
     ports:
@@ -19,7 +19,7 @@ services:
   fpm:
     build: ./docker/php
     volumes:
-      - ./:/code
+      - ./:/kolesa-academy-antispam
 
   # Редис
   redis:
@@ -30,7 +30,7 @@ services:
     build: ./docker/php
     command: /usr/local/bin/codecept run -vvv
     volumes:
-      - ./:/code
+      - ./:/kolesa-academy-antispam
     depends_on:
       - web
 
@@ -39,4 +39,4 @@ services:
     build: ./docker/php
     entrypoint: /bin/sh
     volumes:
-      - ./:/code
+      - ./:/kolesa-academy-antispam
