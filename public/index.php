@@ -37,7 +37,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         // Если POST-запрос не содержит текст, возвращаем ошибку
         if (!isset($_POST['text'])) {
             http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Требуется поле текста']);
+            echo json_encode(['status' => 'error', 'message' => 'field text required']);
             break;
         }
 
