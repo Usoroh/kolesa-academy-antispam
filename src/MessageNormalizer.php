@@ -17,13 +17,12 @@ class MessageNormalizer
     public function normalize($message)
     {
         $message = mb_strtolower($message);
-        echo $message;
         $tokens = $this->tokenize($message);
         $tokens = $this->removeStopWords($tokens);
         $tokens = $this->removeNumericWords($tokens);
         sort($tokens);
         $tokens = array_filter($tokens);
-        return $tokens;
+        return implode(' ', $tokens);
     }
 
     //метод для разбивки сообщения на тоекены
